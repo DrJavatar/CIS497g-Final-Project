@@ -1,0 +1,41 @@
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <title> Login experiment </title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+        $(document).ready(function AjaxJSON() {
+            $("form#constantsForm").submit(function () {
+                var BCBracket = $('#BCBracket').val();
+                var BCRate = $('#BCRate').val();
+                var federalBracket = $('#federalBracket').val();
+                var federalRate = $('#federalRate').val();
+                alert("Data received!" + str);
+                $.ajax({
+                    url: 'http://50.67.64.243/panel',
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(JSON.stringify({
+                        BCBracket: BCBracket,
+                        BCRate: BCRate,
+                        federalBracket: federalBracket,
+                        federalRate: federalRate
+                    }))
+                });
+                // ajax
+            })
+        })
+    </script>
+</head>
+
+<body>
+<h1> LOGIN: </h1>
+<form id="constantsForm" name="constantsForm" method="post">
+    <input type="text" id="BCBracket" name="BCBracket"> BCBracket <br>
+    <input type="BCRate" id="BCRate" name="BCRate"> BCRate <br>
+    <input type="federalBracket" id="federalBracket" name="username"> federalBracket <br>
+    <input type="federalRate" id="federalRate" name="federalRate"> federalRate <br>
+    <input type="submit" class="button positive">
+</form>
+</body>
+</html>

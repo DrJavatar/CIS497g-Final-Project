@@ -4,6 +4,8 @@ class AccountManager {
 
     val accounts = mutableMapOf<String, UserAccount>()
 
+    val activeSessions = mutableMapOf<String, String>()
+
     fun register(account: UserAccount) {
         accounts[account.name] = account
     }

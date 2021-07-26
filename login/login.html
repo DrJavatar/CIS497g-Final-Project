@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="theme-color" content="#99042E" charset="utf-8">
+        <title>Login</title>
+        <link rel="stylesheet" type="text/css" href="assets/css/style-login.css" />
+    </head>
+    <body>
+        <div id="hideBox">
+            <div id="highBox">
+				<div id="logoBox">
+					<img src="assets/img/logo.png"/>
+				</div>
+                <center>
+                	<form method="post" action="http://50.67.64.243:4501/login">
+                        <input type="text"
+                               name="usrname"
+                               id="usrname"
+                               class="textbox"
+                               value="Username"
+                               style="width: 300px;"
+                               autocomplete="off"
+                               onfocus="removeDefault(usrname)"
+                               onblur="setDefault(usrname)"/><br><br>
+                        <input type="password"
+                               name="password"
+                               id="password"
+                               class="textbox"
+                               value="Password"
+                               style="width: 300px;"
+                               autocomplete="off"
+                               onfocus="removeDefault(password)"
+                               onblur="setDefault(password)"/><br><br>
+                        <input type="hidden"
+                        	   name="md5password"/>
+                        <input type="submit"
+                               name="btn"
+                               value="Login"
+                               class="submitbutton"/>
+                	</form>
+                </center>
+            </div>
+            <br>
+            <div id="lowBox" class="textDiv">
+                <p id="oneP" style="font-weight: bold;">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                <p id="twoP" >Suspendisse sit amet consequat metus.</p>
+                <p id="threeP" >Donec in dictum libero, nec vulputate felis.</p>
+            </div>
+        </div>
+        <p id="info">©2018 Marco C. All rights reserved.<a target="_blank" href="info.html">info</a></p>
+        <script type="text/javascript" src="assets/js/java.js"></script>
+        <script type="text/javascript" src="assets/js/md5.js"></script>
+    </body>
+</html>
