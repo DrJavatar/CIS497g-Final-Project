@@ -1,9 +1,22 @@
 plugins {
     kotlin("jvm") version "1.5.21"
+    id("org.beryx.runtime") version "1.12.5"
+    application
 }
 
 group = "com.javatar"
 version = "1.0-SNAPSHOT"
+
+application {
+    mainClass.set("com.javatar.WebServer")
+}
+
+runtime {
+    modules.set(listOf("java.sql", "java.desktop", "jdk.unsupported", "java.scripting", "java.logging", "java.xml", "java.naming"))
+    options.set(listOf("--compress", "2", "--no-header-files", "--no-man-pages"))
+    targetPlatform("linux", "/usr/lib/jvm/java-16-jdk")
+}
+
 
 repositories {
     mavenCentral()

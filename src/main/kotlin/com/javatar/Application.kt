@@ -30,7 +30,7 @@ object Application {
 
         val manager = storage.loadAccounts()
 
-        if(manager.accounts.isEmpty()) {
+        if (manager.accounts.isEmpty()) {
             println("Generating Admin Account!")
             generateFirstTimeAccounts(manager, storage)
         }
@@ -43,15 +43,11 @@ object Application {
             cookie<UserSession>("user_session")
         }
 
-        install(HttpsRedirect) {
-            sslPort = 4502
-        }
-
         install(Authentication) {
             session<UserSession>("auth-session") {
                 validate {
                     println("Validating ${it.id} - ${manager.activeSessions.containsKey(it.id)}")
-                    if(manager.activeSessions.containsKey(it.id)) {
+                    if (manager.activeSessions.containsKey(it.id)) {
                         return@validate it
                     } else {
                         return@validate null
@@ -66,9 +62,9 @@ object Application {
                 passwordParamName = "password"
                 validate { creds ->
                     println("User ${creds.name} - ${creds.password}")
-                    if(manager.accounts.containsKey(creds.name)) {
+                    if (manager.accounts.containsKey(creds.name)) {
                         val user = manager.accounts[creds.name]!!
-                        if(BCrypt.verifyer().verify(creds.password.toCharArray(), user.password).verified) {
+                        if (BCrypt.verifyer().verify(creds.password.toCharArray(), user.password).verified) {
                             return@validate UserIdPrincipal(creds.name)
                         } else {
                             return@validate null
@@ -82,57 +78,61 @@ object Application {
 
         routing {
 
-            get("test") {
-                call.respond("Hello, World")
-            }
-
-            get("values") {
-                call.respond(taxValues)
-            }
-
-            static("/") {
-                staticRootFolder = File("login")
-                default("login.html")
-            }
-            static("assets") {
-                staticRootFolder = File("login")
-                files("assets")
-            }
-
-            authenticate("admin") {
-                post("login") {
-                    val id = UUID.randomUUID().toString()
-                    val user = call.principal<UserIdPrincipal>()
-                    if(user != null) {
-                        call.sessions.set(UserSession(id))
-                        manager.activeSessions[id] = user.name
-                        manager.activeSessions.forEach { (t, u) ->
-                            println("User $u - ID $t")
-                        }
-                        call.respondRedirect("/panel")
-                    } else {
-                        call.respond(UnauthorizedResponse())
-                    }
+            try {
+                get("test") {
+                    call.respond("Hello, World")
                 }
-            }
 
-            authenticate("auth-session") {
-                static("/panel") {
+                get("values") {
+                    call.respond(taxValues)
+                }
+
+                static("/") {
                     staticRootFolder = File("login")
-                    default("admin-page.html")
-                    post {
-                        try {
-                            parseParameters(call.receiveParameters())
+                    default("login.html")
+                }
+                static("assets") {
+                    staticRootFolder = File("login")
+                    files("assets")
+                }
+
+                authenticate("admin") {
+                    post("login") {
+                        val id = UUID.randomUUID().toString()
+                        val user = call.principal<UserIdPrincipal>()
+                        if (user != null) {
+                            call.sessions.set(UserSession(id))
+                            manager.activeSessions[id] = user.name
+                            manager.activeSessions.forEach { (t, u) ->
+                                println("User $u - ID $t")
+                            }
                             call.respondRedirect("/panel")
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+                        } else {
+                            call.respond(UnauthorizedResponse())
                         }
                     }
-                    get("/logout") {
-                        call.sessions.clear<UserSession>()
-                        call.respondRedirect("/login")
+                }
+
+                authenticate("auth-session") {
+                    static("/panel") {
+                        staticRootFolder = File("login")
+                        default("admin-page.html")
+                        post {
+                            try {
+                                parseParameters(call.receiveParameters())
+                                call.respondRedirect("/panel")
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                        get("/logout") {
+                            call.sessions.clear<UserSession>()
+                            call.respondRedirect("/login")
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
 
         }
