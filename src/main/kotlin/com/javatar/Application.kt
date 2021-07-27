@@ -5,6 +5,7 @@ import com.javatar.accounts.AccountManager
 import com.javatar.accounts.Privilege
 import com.javatar.accounts.UserAccount
 import com.javatar.accounts.UserSession
+import com.javatar.data.LoginRecord
 import com.javatar.data.TaxBaseValues
 import com.javatar.files.FileStorage
 import io.ktor.application.*
@@ -12,23 +13,27 @@ import io.ktor.application.Application
 import io.ktor.auth.*
 import io.ktor.features.*
 import io.ktor.gson.*
+import io.ktor.html.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.sessions.*
+import kotlinx.html.*
 import java.io.File
+import java.time.LocalDateTime
 import java.util.*
 
 object Application {
 
-    val storage = FileStorage()
-    var taxValues = TaxBaseValues()
+    private val storage = FileStorage()
+    private var taxValues = TaxBaseValues()
 
     fun Application.main() {
 
         val manager = storage.loadAccounts()
+        taxValues = storage.loadTaxBaseValues()
 
         if (manager.accounts.isEmpty()) {
             println("Generating Admin Account!")
@@ -106,6 +111,7 @@ object Application {
                             manager.activeSessions.forEach { (t, u) ->
                                 println("User $u - ID $t")
                             }
+                            manager.loginRecords.add(LoginRecord(user.name, LocalDateTime.now().toString()))
                             call.respondRedirect("/panel")
                         } else {
                             call.respond(UnauthorizedResponse())
@@ -123,6 +129,41 @@ object Application {
                                 call.respondRedirect("/panel")
                             } catch (e: Exception) {
                                 e.printStackTrace()
+                            }
+                        }
+                        get("logs") {
+                            call.respondHtml {
+                                head {
+                                    title {
+                                        +"Login Logs"
+                                    }
+                                }
+                                body {
+                                    table {
+                                        thead {
+                                            tr {
+                                                th {
+                                                    +"Username"
+                                                }
+                                                th {
+                                                    +"Date"
+                                                }
+                                            }
+                                        }
+                                        tbody {
+                                            manager.loginRecords.forEach {
+                                                tr {
+                                                    td {
+                                                        +it.username
+                                                    }
+                                                    td {
+                                                        +it.date
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         get("/logout") {
@@ -143,7 +184,9 @@ object Application {
         val bcRate = params["BCRate"]?.split(",")?.map { it.toDouble() }?.toDoubleArray() ?: doubleArrayOf()
         val federalBracket = params["username"]?.split(",")?.map { it.toInt() }?.toIntArray() ?: intArrayOf()
         val federalRate = params["federalRate"]?.split(",")?.map { it.toDouble() }?.toDoubleArray() ?: doubleArrayOf()
-        taxValues = TaxBaseValues(bcBracket, bcRate, federalBracket, federalRate)
+        val tb = TaxBaseValues(bcBracket, bcRate, federalBracket, federalRate)
+        storage.saveTaxBaseValues(tb)
+        taxValues = tb
     }
 
     private fun generateFirstTimeAccounts(manager: AccountManager, storage: FileStorage) {

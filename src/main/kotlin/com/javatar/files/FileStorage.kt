@@ -2,6 +2,7 @@ package com.javatar.files
 
 import com.google.gson.GsonBuilder
 import com.javatar.accounts.AccountManager
+import com.javatar.data.TaxBaseValues
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -21,6 +22,21 @@ class FileStorage {
             )
         } catch (e: Exception) {
             return AccountManager()
+        }
+    }
+
+    fun saveTaxBaseValues(base: TaxBaseValues) {
+        Files.write(Path.of("taxValues.json"), gson.toJson(base).toByteArray())
+    }
+
+    fun loadTaxBaseValues(): TaxBaseValues {
+        return try {
+            gson.fromJson(
+                Files.readString(Path.of("taxValues.json")),
+                TaxBaseValues::class.java
+            )
+        } catch (e: java.lang.Exception) {
+            return TaxBaseValues()
         }
     }
 

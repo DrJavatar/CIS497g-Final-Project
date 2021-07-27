@@ -29,5 +29,7 @@ dependencies {
     implementation("io.ktor:ktor-auth:1.5.2")
     implementation("io.ktor:ktor-gson:1.5.2")
     implementation("io.ktor:ktor-network-tls-certificates:1.5.2")
+    implementation("io.ktor:ktor-html-builder:1.5.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.3")
     implementation("at.favre.lib:bcrypt:0.9.0")
 }
